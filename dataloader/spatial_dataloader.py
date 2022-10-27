@@ -9,14 +9,15 @@ from skimage import io, color, exposure
 class spatial_dataset(Dataset):  
     def __init__(self, dic, root_dir, mode, transform=None):
  
-        self.keys = dic.keys()
-        self.values=dic.values()
+#         self.keys = dic.keys()
+#         self.values=dic.values()
+        self.dic=dic
         self.root_dir = root_dir
         self.mode =mode
         self.transform = transform
 
     def __len__(self):
-        return len(self.keys)
+        return len(self.dic)
 
     def load_ucf_image(self,video_name, index):
         if video_name.split('_')[0] == 'HandstandPushups':
@@ -35,7 +36,7 @@ class spatial_dataset(Dataset):
     def __getitem__(self, idx):
 
         if self.mode == 'train':
-            video_name, nb_clips = self.keys[idx].split(' ')
+            video_name, nb_clips = list(self.dic.keys())[idx].split(' ')
             nb_clips = int(nb_clips)
             clips = []
             clips.append(random.randint(1, nb_clips/3))
@@ -43,12 +44,12 @@ class spatial_dataset(Dataset):
             clips.append(random.randint(nb_clips*2/3, nb_clips+1))
             
         elif self.mode == 'val':
-            video_name, index = self.keys[idx].split(' ')
+            video_name, index = list(self.dic.keys())[idx].split(' ')
             index =abs(int(index))
         else:
             raise ValueError('There are only train and val mode')
 
-        label = self.values[idx]
+        label = list(self.dic.values())[idx]
         label = int(label)-1
         
         if self.mode=='train':
